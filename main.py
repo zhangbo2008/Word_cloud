@@ -151,11 +151,55 @@ for i in range(len(b)):
     b[i][2]=low_dim_embs[i]
 
 uuuuu=str(b)
-#chuanshu22288.json  这个数据就是给前端用的!!!!!!!!!!!!!!!!!1
-with open("chuanshu22288.json",mode='w') as f:
-    f.write(uuuuu)
+
 
 ##
+import json
+#chuanshu22288.json  这个数据就是给前端用的!!!!!!!!!!!!!!!!!1
+bb=b
+for i in range(len(bb)):
+    bb[i][2]=list(bb[i][2])
+
+
+import json
+
+
+# define A.class
+class node:
+    def __init__(self, id,label,x,y,size):
+        self.id = id
+        self.label = label
+        self.x = x
+        self.y = y
+        self.size = size
+
+list1=[]
+for i,j in enumerate(bb):
+    list1.append(node(i,j[0],float(j[2][0]),float(j[2][1]),j[1]).__dict__)
+
+
+print(json.dumps(list1))
+
+nodes={"nodes":list1}
+
+print()
+
+tmp=json.dumps(nodes,ensure_ascii=False)
+
+with open("chuanshu22288.json",mode='w',encoding='utf-8') as f:
+
+    f.write(tmp)
+
+
+
+
+##
+
+
+
+
+
+
 
 
 import matplotlib.pyplot as plt
