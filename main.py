@@ -80,7 +80,15 @@ def similarity_route():
         # 从下面代码看出来,腾讯词向量的度量是Cosine
         return {'word1':word1,'word2':word2,'similarity':float(model.similarity(word1, word2))}
 
+def similarity(a,b):
+    word1 = a
+    word2 = b
+    if isNoneWords(word1) or isNoneWords(word2):
+        return None
+    else:
 
+        # 从下面代码看出来,腾讯词向量的度量是Cosine
+        return float(model.similarity(word1, word2))
 
 
 # 下面调用这个函数即可vec_route
@@ -153,7 +161,7 @@ for i in range(len(b)):
 uuuuu=str(b)
 
 
-##
+
 import json
 #chuanshu22288.json  这个数据就是给前端用的!!!!!!!!!!!!!!!!!1
 bb=b
@@ -166,29 +174,13 @@ import json
 
 # define A.class
 class node:
-    def __init__(self, id,label,x,y,size):
+    def __init__(self, id,label,x,y,size,color):
         self.id = id
         self.label = label
         self.x = x
         self.y = y
         self.size = size
-
-list1=[]
-for i,j in enumerate(bb):
-    list1.append(node(i,j[0],float(j[2][0]),float(j[2][1]),j[1]).__dict__)
-
-
-print(json.dumps(list1))
-
-nodes={"nodes":list1}
-
-print()
-
-tmp=json.dumps(nodes,ensure_ascii=False)
-
-with open("chuanshu22288.json",mode='w',encoding='utf-8') as f:
-
-    f.write(tmp)
+        self.color=color
 
 
 
@@ -210,7 +202,8 @@ from sklearn import metrics
 
 
 #选择聚类数K=2  聚类小于=8,因为颜色就写了8个
-y_pred=KMeans(n_clusters=4).fit_predict(low_dim_embs)
+n_clusters=4
+y_pred=KMeans(n_clusters=n_clusters).fit_predict(low_dim_embs)
 
 with open("y_pred.json",mode='w') as f:
     f.write(str(y_pred))
@@ -218,6 +211,77 @@ with open("y_pred.json",mode='w') as f:
 
 
 colorlist=['red','black','yellow','greenyellow','blue','brown','coral','cyan']
+
+
+
+
+
+
+
+
+list1=[]
+for i,j in enumerate(bb):
+    list1.append(node(i,j[0],float((float(j[2][0]))),float((float(j[2][1]))),float(j[1]**0.5),colorlist[y_pred[i]]).__dict__)
+
+
+
+
+nodes={}
+
+
+
+tmp=json.dumps(nodes,ensure_ascii=False)
+
+
+
+
+
+
+
+# 接口:https://github.com/xukuanzhuo/xukuanzhuo.github.io/issues/8
+#下面把每一个聚类里面的距离算一下.
+#similarity
+
+
+class edge:
+    def __init__(self, sourceID,targetID,size):
+        self.sourceID = sourceID
+        self.targetID = targetID
+
+        self.size = size
+
+list3=[]
+for i in range(n_clusters):
+    dexlist=[]
+    for j in range(len(y_pred)):
+         if y_pred[j]==i:
+             dexlist.append(j)
+    for i1 in range(len(dexlist)):
+        for i2 in range(i1+1,len(dexlist)):
+                left=dexlist[i1]  # 得到索引.
+                right=dexlist[i2]
+                similar=similarity(bb[left][0],bb[right][0])
+                list3.append(edge(bb[left][0],bb[right][0],similar).__dict__)
+
+all3={"nodes":list1,"edges":list3}
+
+
+
+tmp2=json.dumps(all3,ensure_ascii=False)
+
+with open("chuanshu22288.json",mode='w',encoding='utf-8') as f:
+
+    f.write(tmp2)
+
+
+
+
+
+
+
+
+
+
 
 def plot_with_labels(low_dim_embs=low_dim_embs, labels=label, filename="output.png"):   # 绘制词向量图
     assert low_dim_embs.shape[0] >= len(labels), 'More labels than embeddings'
@@ -236,7 +300,7 @@ def plot_with_labels(low_dim_embs=low_dim_embs, labels=label, filename="output.p
 
 
 
-plot_with_labels()
+# plot_with_labels()
 
 
 
@@ -244,7 +308,7 @@ plot_with_labels()
 
 
 
-
+print("allover!!!!!!!!!!")
 
 
 ##
